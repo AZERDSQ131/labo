@@ -5,7 +5,7 @@
  */
 export const support = {
   raisedEur: 181,
-  goalEur: 1600,
+  goalEur: 5000,
   donations: 5,
   updated: '2026-09-13',
 };
