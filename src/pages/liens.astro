@@ -1,0 +1,238 @@
+---
+import Base from '../layouts/Base.astro';
+import { getModels } from '../data/models';
+import { externalLinks } from '../data/siteData';
+
+const models = await getModels();
+const published = models.filter((m) => m.links.length > 0);
+---
+
+<Base
+  title="Liens"
+  description="Tous les liens publics du laboratoire : Hugging Face, Ollama, dépôts GitHub."
+>
+  <section class="section page-head">
+    <div class="wrap">
+      <h1>Liens</h1>
+      <p class="lede">
+        Tout ce qui est public, au même endroit. Si un lien n'est pas listé
+        ici, l'artefact n'est pas publié.
+      </p>
+    </div>
+  </section>
+
+  <section class="section support">
+    <div class="wrap">
+      <div class="card support-card" style="--c: var(--c-orange)">
+        <div class="support-text">
+          <p class="eyebrow" style="--c: var(--c-orange)">Soutenir</p>
+          <h2>Soutenez le projet</h2>
+          <p>
+            Recherche indépendante, petits modèles, résultats publics.
+            Si vous voulez aider à financer le calcul et le matériel,
+            c'est ici.
+          </p>
+        </div>
+        <a class="btn btn-primary" href={externalLinks.gofundme} rel="external"
+          >Faire un don sur GoFundMe</a
+        >
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <h2>Plateformes</h2>
+      <div class="link-cards">
+        <a class="card link-card" href={externalLinks.huggingface} rel="external" style="--c: var(--c-blue)">
+          <h3>Hugging Face</h3>
+          <p>Poids safetensors, model cards et tokenizer de tous les modèles publiés.</p>
+          <span class="dest mono">huggingface.co/AZERDSQ</span>
+        </a>
+        <a class="card link-card" href={externalLinks.ollama} rel="external" style="--c: var(--c-green)">
+          <h3>Ollama</h3>
+          <p>Exécution locale en une commande, versions GGUF quantifiées.</p>
+          <span class="dest mono">ollama.com/azerdsq</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <h2>Par modèle</h2>
+      <div class="per-model">
+        {
+          published.map((m) => (
+            <div class="model-links">
+              <h3>
+                <a href={`/labo/modeles#${m.slug}`}>{m.name}</a>
+              </h3>
+              <ul>
+                {m.links.map((l) => (
+                  <li>
+                    <a href={l.href} rel="external">
+                      {l.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <h2>Dépôts GitHub</h2>
+      <ul class="repos">
+        <li>
+          <a href={externalLinks.githubG0} rel="external">G0-nano</a>
+          <span>code source complet du pipeline (Apache 2.0)</span>
+        </li>
+        <li>
+          <a href={externalLinks.githubC1} rel="external">gdn2-vs-transformer-scaling</a>
+          <span>kit de reproduction de l'expérience C1</span>
+        </li>
+        <li>
+          <a href={externalLinks.githubAA} rel="external">aa-intelligence-index-reverse</a>
+          <span>calculateur de l'Artificial Analysis Intelligence Index</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-head {
+    padding-bottom: 0;
+  }
+
+  .support {
+    padding-bottom: 0;
+  }
+
+  .support-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    border-color: color-mix(in srgb, var(--c-orange) 55%, white);
+    box-shadow: 0 16px 40px -24px color-mix(in srgb, var(--c-orange) 55%, transparent);
+  }
+
+  .support-card:hover {
+    text-decoration: none;
+  }
+
+  .support-text h2 {
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.5rem;
+  }
+
+  .support-card p {
+    color: var(--muted);
+    font-size: 1rem;
+    margin: 0;
+    max-width: 52ch;
+  }
+
+  .support-card .eyebrow {
+    margin-bottom: 0.7rem;
+  }
+
+  .support-card .btn {
+    flex-shrink: 0;
+  }
+
+  .link-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  .link-card {
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .link-card:hover {
+    transform: none;
+    border-color: var(--line);
+    box-shadow: none;
+  }
+
+  .link-card h3 {
+    margin: 0;
+  }
+
+  .link-card p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin: 0;
+    flex: 1;
+  }
+
+  .dest {
+    font-size: 0.8rem;
+    color: var(--accent);
+  }
+
+  .per-model {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+
+  .model-links h3 {
+    margin-bottom: 0.6rem;
+  }
+
+  .model-links ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .repos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .repos li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .repos a {
+    font-weight: 500;
+  }
+
+  .repos span {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 720px) {
+    .link-cards,
+    .per-model {
+      grid-template-columns: 1fr;
+    }
+
+    .support-card {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

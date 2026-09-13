@@ -1,0 +1,90 @@
+---
+import { externalLinks } from '../data/siteData';
+---
+
+<footer class="site-footer">
+  <div class="wrap grid">
+    <div class="col-brand">
+      <p class="note">
+        Laboratoire indépendant de petits modèles de langue. Entraînement from
+        scratch sur matériel contraint, benchmarks honnêtes, poids ouverts.
+      </p>
+    </div>
+    <nav aria-label="Modèles" class="col">
+      <p class="col-title">Modèles</p>
+      <a href="/labo/modeles#g1-nano">G1 Nano</a>
+      <a href="/labo/modeles#g0-nano">G0 Nano</a>
+      <a href="/labo/modeles#g2-nano">G2 Nano</a>
+      <a href="/labo/modeles#g2-nano-safety">G2 Nano Safety</a>
+    </nav>
+    <nav aria-label="Projet" class="col">
+      <p class="col-title">Projet</p>
+      <a href="/labo/benchmarks">Benchmarks</a>
+      <a href="/labo/recherche">Recherche</a>
+      <a href="/labo/liens">Liens</a>
+    </nav>
+    <nav aria-label="Externe" class="col">
+      <p class="col-title">Externe</p>
+      <a href={externalLinks.huggingface} rel="external">Hugging Face</a>
+      <a href={externalLinks.ollama} rel="external">Ollama</a>
+      <a href={externalLinks.githubG0} rel="external">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 2.5rem;
+    padding-block: 3.5rem 2.5rem;
+  }
+
+  .note {
+    color: var(--muted);
+    font-size: 0.95rem;
+    max-width: 34ch;
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .col-title {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 0.5rem;
+  }
+
+  .col a {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .col a:hover {
+    color: var(--ink);
+  }
+
+  @media (max-width: 820px) {
+    .grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

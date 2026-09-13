@@ -1,0 +1,100 @@
+---
+import type { BenchScores } from '../data/modelTypes';
+
+interface Row {
+  label: string;
+  scores: BenchScores;
+  highlight?: boolean;
+}
+
+interface Props {
+  rows: Row[];
+  caption?: string;
+  full?: boolean;
+  chance?: string[];
+}
+
+const { rows, caption, full = false, chance } = Astro.props;
+
+const cols: { key: keyof BenchScores; label: string }[] = [
+  { key: 'lambada', label: 'LAMBADA' },
+  { key: 'piqa', label: 'PIQA' },
+  { key: 'winogrande', label: 'WinoGrande' },
+  { key: 'arcEasy', label: 'ARC-E' },
+  { key: 'arcChallenge', label: 'ARC-C' },
+  { key: 'sciq', label: 'SciQ' },
+  { key: 'mean6', label: 'Moy. 6' },
+];
+
+if (full) {
+  cols.splice(
+    5,
+    2,
+    { key: 'hellaswag', label: 'HellaSwag' },
+    { key: 'sciq', label: 'SciQ' },
+    { key: 'mean7', label: 'Moy. 7' },
+  );
+}
+
+const fmt = (v?: number) => (v === undefined ? 'n/a' : v.toFixed(2).replace('.', ','));
+
+// Meilleur score par colonne parmi les lignes fournies, moyenne incluse.
+const best: Partial<Record<keyof BenchScores, number>> = {};
+for (const { key } of cols) {
+  const vals = rows.map((r) => r.scores[key]).filter((v): v is number => v !== undefined);
+  if (vals.length) best[key] = Math.max(...vals);
+}
+---
+
+<div class="table-scroll">
+  <table class="data">
+    {caption && <caption class="sr-only">{caption}</caption>}
+    <thead>
+      <tr>
+        <th scope="col">Modèle</th>
+        {cols.map((c) => <th scope="col">{c.label}</th>)}
+      </tr>
+      {chance && (
+        <tr class="chance">
+          <th scope="col">Hasard</th>
+          {chance.map((c) => <th scope="col">{c}</th>)}
+        </tr>
+      )}
+    </thead>
+    <tbody>
+      {
+        rows.map((row) => (
+          <tr class:list={[{ hl: row.highlight }]}>
+            <td>{row.label}</td>
+            {cols.map((c) => (
+              <td class:list={['num', { best: row.scores[c.key] !== undefined && row.scores[c.key] === best[c.key] }]}>
+                {fmt(row.scores[c.key])}
+              </td>
+            ))}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .hl td:first-child {
+    font-weight: 500;
+  }
+
+  .chance th {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+</style>

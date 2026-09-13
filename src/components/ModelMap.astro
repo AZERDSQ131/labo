@@ -1,0 +1,370 @@
+---
+interface Point {
+  label: string;
+  params: number;
+  score: number;
+  ours?: boolean;
+  partial?: boolean;
+}
+
+interface Props {
+  points: Point[];
+}
+
+const { points } = Astro.props;
+
+const width = 1120;
+const height = 620;
+const margin = { top: 42, right: 34, bottom: 72, left: 82 };
+const plotWidth = width - margin.left - margin.right;
+const plotHeight = height - margin.top - margin.bottom;
+const xMin = 50e6;
+const xMax = (200e6 * 5) / 6;
+const yMin = 30;
+const yMax = 47;
+
+const xScale = (value: number) =>
+  margin.left +
+  ((Math.log10(value) - Math.log10(xMin)) / (Math.log10(xMax) - Math.log10(xMin))) *
+    plotWidth;
+const yScale = (value: number) =>
+  margin.top + ((yMax - value) / (yMax - yMin)) * plotHeight;
+
+const plotPoints = points.map((point) => ({
+  ...point,
+  x: xScale(point.params),
+  y: yScale(point.score),
+}));
+
+const zoneX = xScale(50e6);
+const zoneWidth = xScale(100e6) - zoneX;
+const zoneY = yScale(yMax);
+const zoneHeight = yScale(40) - zoneY;
+
+const yTicks = [30, 35, 40, 45];
+const xTicks = [
+  { value: 50e6, label: '50M' },
+  { value: 100e6, label: '100M' },
+  { value: 150e6, label: '150M' },
+];
+const wrapTooltipText = (text: string, maxChars: number) => {
+  const lines: string[] = [];
+  let line = '';
+
+  for (const word of text.split(' ')) {
+    const candidate = line ? `${line} ${word}` : word;
+    if (line && candidate.length > maxChars) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = candidate;
+    }
+  }
+
+  if (line) lines.push(line);
+  return lines;
+};
+
+const labelOffsets: Record<string, [number, number]> = {
+  'G2 Nano': [10, -14],
+  'G0 Nano': [10, 4],
+  'G1 Nano': [10, 20],
+  'G2-nano-base': [10, -14],
+  'G0-nano-base': [10, -12],
+  'G0-nano-instruct': [10, 18],
+  'G1-nano-base': [-8, 8],
+  'G2-nano-instruct': [10, 20],
+  'Pythia-70M': [10, 15],
+  'Ronan-1.3-75M': [10, -14],
+  'Ronan-125M': [10, 20],
+  'Ronan-1.3-125M': [10, -14],
+  'Pythia-70M-deduped': [10, -12],
+  'Boris-1.3-75M': [10, -14],
+  'Boris-125M': [10, 18],
+  'Boris-1.3-125M': [10, -12],
+  'Boris-1.7-D60M-n30M avec n-gram': [10, -14],
+  'Boris-1.7-D60M-n30M sans n-gram': [-10, 18],
+  'Pythia-160M': [-10, 18],
+  'SmolLM2-135M (5/7 historique)': [10, -12],
+};
+
+const labelAnchors: Record<string, 'start' | 'end'> = {
+  'G1-nano-base': 'end',
+  'Pythia-160M': 'end',
+  'Boris-1.7-D60M-n30M sans n-gram': 'end',
+};
+---
+
+<div class="model-map-shell">
+  <div class="model-map-viewport">
+    <svg
+      viewBox={`0 0 ${width} ${height}`}
+      role="img"
+      aria-label="Moyenne des benchmarks selon le nombre de paramètres"
+      aria-describedby="model-map-description"
+    >
+      <desc id="model-map-description">
+        Les modèles les plus intéressants sont dans la zone verte, avec une moyenne élevée
+        pour un nombre de paramètres réduit.
+      </desc>
+
+      <g>
+        <rect
+          x={margin.left}
+          y={margin.top}
+          width={plotWidth}
+          height={plotHeight}
+          fill="var(--bg)"
+        />
+        <rect
+          x={zoneX}
+          y={zoneY}
+          width={zoneWidth}
+          height={zoneHeight}
+          class="model-map-zone"
+        />
+
+        {
+          yTicks.map((tick) => (
+            <g class="model-map-grid-line">
+              <line x1={margin.left} x2={width - margin.right} y1={yScale(tick)} y2={yScale(tick)} />
+              <text x={margin.left - 14} y={yScale(tick) + 4} text-anchor="end">
+                {tick} %
+              </text>
+            </g>
+          ))
+        }
+        {
+          xTicks.map((tick) => (
+            <g class="model-map-grid-line">
+              <line x1={xScale(tick.value)} x2={xScale(tick.value)} y1={margin.top} y2={height - margin.bottom} />
+              <text x={xScale(tick.value)} y={height - margin.bottom + 28} text-anchor="middle">
+                {tick.label}
+              </text>
+            </g>
+          ))
+        }
+
+        <line class="model-map-axis" x1={margin.left} x2={width - margin.right} y1={height - margin.bottom} y2={height - margin.bottom} />
+        <line class="model-map-axis" x1={margin.left} x2={margin.left} y1={margin.top} y2={height - margin.bottom} />
+        <text class="model-map-axis-label" x={width / 2} y={height - 18} text-anchor="middle">
+          paramètres · échelle logarithmique
+        </text>
+        <text
+          class="model-map-axis-label"
+          transform={`translate(20 ${height / 2}) rotate(-90)`}
+          text-anchor="middle"
+        >
+          moyenne disponible · acc
+        </text>
+
+        {
+          plotPoints.map((point) => {
+            const [dx, dy] = labelOffsets[point.label] ?? [10, -10];
+            const labelAnchor = labelAnchors[point.label] ?? 'start';
+            const labelLines = wrapTooltipText(point.label, 20);
+            const tooltipDetail = `Moyenne : ${point.score.toFixed(2).replace('.', ',')} % · ${(point.params / 1e6).toFixed(1).replace('.', ',')} M paramètres`;
+            const titleLines = wrapTooltipText(point.label, 28);
+            const detailLines = wrapTooltipText(tooltipDetail, 42);
+            const tooltipLines = [...titleLines, ...detailLines];
+            const lineHeight = 17;
+            const tooltipWidth = Math.min(
+              360,
+              Math.max(150, Math.max(...tooltipLines.map((line) => line.length * 7)) + 22),
+            );
+            const tooltipHeight = 16 + tooltipLines.length * lineHeight;
+            const tooltipX = Math.min(
+              Math.max(point.x - tooltipWidth / 2, margin.left),
+              width - margin.right - tooltipWidth,
+            );
+            const tooltipY =
+              point.y > height - margin.bottom - tooltipHeight - 10
+                ? point.y - tooltipHeight - 14
+                : point.y + 14;
+            return (
+              <g
+                class:list={['model-map-point', { ours: point.ours, partial: point.partial }]}
+                role="img"
+                tabindex="0"
+                aria-label={`${point.label}, ${point.score.toFixed(2)} %, ${(point.params / 1e6).toFixed(1)} millions de paramètres`}
+              >
+                {point.partial ? (
+                  <rect x={point.x - 7} y={point.y - 7} width="14" height="14" rx="2" />
+                ) : (
+                  <circle cx={point.x} cy={point.y} r={point.ours ? 8 : 7} />
+                )}
+                <text x={point.x + dx} y={point.y + dy} text-anchor={labelAnchor}>
+                  {labelLines.map((line, index) => (
+                    <tspan x={point.x + dx} dy={index === 0 ? 0 : 15}>{line}</tspan>
+                  ))}
+                </text>
+                <g
+                  class="model-map-tooltip-wrap"
+                  x={tooltipX}
+                  y={tooltipY}
+                  style="opacity:0;visibility:hidden"
+                >
+                  <rect
+                    class="model-map-tooltip-bg"
+                    x={tooltipX}
+                    y={tooltipY}
+                    width={tooltipWidth}
+                    height={tooltipHeight}
+                    rx="5"
+                    style="fill:#101012;stroke:#5b5b61;stroke-width:1"
+                  />
+                  <text class="model-map-tooltip-title" x={tooltipX + 10} y={tooltipY + 20} style="fill:#fcfcfa">
+                    {titleLines.map((line, index) => (
+                      <tspan x={tooltipX + 10} dy={index === 0 ? 0 : lineHeight}>{line}</tspan>
+                    ))}
+                  </text>
+                  <text
+                    class="model-map-tooltip-detail"
+                    x={tooltipX + 10}
+                    y={tooltipY + 20 + titleLines.length * lineHeight}
+                    style="fill:#fcfcfa"
+                  >
+                    {detailLines.map((line, index) => (
+                      <tspan x={tooltipX + 10} dy={index === 0 ? 0 : lineHeight}>{line}</tspan>
+                    ))}
+                  </text>
+                </g>
+              </g>
+            );
+          })
+        }
+      </g>
+    </svg>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.model-map-shell').forEach((shell) => {
+    shell.querySelectorAll<SVGGElement>('.model-map-point').forEach((point) => {
+      const bringToFront = () => {
+        const parent = point.parentElement;
+        if (parent && parent.lastElementChild !== point) {
+          parent.append(point);
+        }
+      };
+
+      point.addEventListener('pointerenter', bringToFront);
+      point.addEventListener('focusin', bringToFront);
+    });
+  });
+</script>
+
+<style>
+  .model-map-shell {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+  }
+
+  .model-map-viewport {
+    overflow: hidden;
+  }
+
+  .model-map-viewport svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: var(--bg);
+  }
+
+  .model-map-grid-line line {
+    stroke: var(--line);
+    stroke-width: 1;
+  }
+
+  .model-map-grid-line text,
+  .model-map-axis-label {
+    fill: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+
+  .model-map-axis {
+    stroke: var(--line-strong);
+    stroke-width: 1;
+  }
+
+  .model-map-zone {
+    fill: var(--c-green);
+    opacity: 0.42;
+  }
+
+  .model-map-point circle,
+  .model-map-point rect {
+    fill: var(--surface);
+    stroke: var(--faint);
+    stroke-width: 2;
+  }
+
+  .model-map-point.ours circle {
+    fill: var(--ink);
+    stroke: var(--ink);
+  }
+
+  .model-map-point.partial rect {
+    fill: var(--surface);
+    stroke: var(--faint);
+  }
+
+  .model-map-point text {
+    fill: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    pointer-events: none;
+  }
+
+  .model-map-point:focus {
+    outline: none;
+  }
+
+  .model-map-point:hover,
+  .model-map-point:focus-visible {
+    z-index: 100;
+  }
+
+  .model-map-tooltip-wrap {
+    pointer-events: none;
+    z-index: var(--tooltip-z);
+    transition: opacity 120ms ease, visibility 120ms ease;
+  }
+
+  .model-map-point:hover .model-map-tooltip-wrap,
+  .model-map-point:focus-visible .model-map-tooltip-wrap {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .model-map-point .model-map-tooltip-bg {
+    fill: var(--tooltip-bg) !important;
+    stroke: var(--tooltip-border) !important;
+    stroke-width: 1;
+  }
+
+  .model-map-point .model-map-tooltip-title,
+  .model-map-point .model-map-tooltip-detail {
+    fill: var(--tooltip-fg) !important;
+    font-family: var(--font-sans);
+    font-size: var(--tooltip-font-size);
+    pointer-events: none;
+  }
+
+  .model-map-tooltip-title {
+    font-weight: 650;
+  }
+
+  .model-map-tooltip-detail {
+    opacity: 0.78;
+  }
+
+  .model-map-point.ours text {
+    fill: var(--ink);
+  }
+
+</style>

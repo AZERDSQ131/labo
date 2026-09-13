@@ -1,0 +1,21 @@
+HTTP/2 200 
+content-type: image/svg+xml
+content-md5: bYAvaN8MCaSZfP0o7q/Z/w==
+last-modified: Wed, 14 Aug 2024 19:18:58 GMT
+etag: "0x8DCBC95F2647EDF"
+server: Windows-Azure-Web/1.0 Microsoft-HTTPAPI/2.0
+via: 1.1 varnish, 1.1 varnish
+accept-ranges: bytes
+date: Sat, 12 Sep 2026 17:57:47 GMT
+age: 109
+x-served-by: cache-iad-kiad7000081-IAD, cache-par-lfpg1960082-PAR
+x-cache: HIT, HIT
+x-cache-hits: 883012, 1
+cross-origin-resource-policy: cross-origin
+access-control-allow-origin: *
+strict-transport-security: max-age=31536000
+timing-allow-origin: *
+x-fastly-request-id: b7a0b800c2ca51590cb6024dae50f1010c6f355f
+alt-svc: h3=":443";ma=86400,h3-29=":443";ma=86400,h3-27=":443";ma=86400
+content-length: 959
+

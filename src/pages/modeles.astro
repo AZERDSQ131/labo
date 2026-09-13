@@ -1,0 +1,73 @@
+---
+import Base from '../layouts/Base.astro';
+import ModelCard from '../components/ModelCard.astro';
+import { getModels } from '../data/models';
+
+const models = getModels();
+const modelOrder = ['g0-nano', 'g1-nano', 'g2-nano', 'g2-nano-safety'];
+const orderedModels = [...models].sort(
+  (a, b) => modelOrder.indexOf(a.slug) - modelOrder.indexOf(b.slug),
+);
+const categoryOrder: Array<'Série G' | 'Sécurité'> = ['Série G', 'Sécurité'];
+const categoryGroups = categoryOrder.map((label) => ({
+  label,
+  models: orderedModels.filter((model) => model.category === label),
+}));
+---
+
+<Base
+  title="Modèles"
+  description="Les modèles du laboratoire, avec une courte description et les liens Hugging Face, Ollama et GitHub."
+>
+  <section class="section page-head">
+    <div class="wrap">
+      <h1>Modèles</h1>
+      <p class="lede">
+        Les modèles du laboratoire, avec une courte description et les liens
+        Hugging Face, Ollama et GitHub.
+      </p>
+    </div>
+  </section>
+
+  <section class="section models-content">
+    <div class="wrap">
+      <div class="model-groups">
+        {
+          categoryGroups.map((group, index) => (
+            <section class="model-group" aria-labelledby={`category-${index}`}>
+              <h2 id={`category-${index}`}>{group.label}</h2>
+              <div class="model-list">
+                {group.models.map((model) => <ModelCard model={model} />)}
+              </div>
+            </section>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-head {
+    padding-bottom: 0;
+  }
+
+  .model-groups {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .model-group h2 {
+    margin: 0;
+    color: var(--faint);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .model-list {
+    margin-top: 0.35rem;
+  }
+</style>

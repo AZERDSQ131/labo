@@ -1,0 +1,276 @@
+---
+import Base from '../layouts/Base.astro';
+import ModelMap from '../components/ModelMap.astro';
+import SecurityShowcase from '../components/SecurityShowcase.astro';
+
+// Comparaison homogène des trois Nano : mean_6, car HellaSwag manque encore
+// pour G1 Nano base dans le suivi de benchmark.
+const benchRows = [
+  {
+    label: 'G0 Nano',
+    params: 62.11e6,
+    plotScore: 43.51,
+    scores: { lambada: 19.39, piqa: 58.98, winogrande: 52.17, arcEasy: 45.66, arcChallenge: 18.17, sciq: 66.70, mean6: 43.51 },
+    highlight: true,
+  },
+  {
+    label: 'G1 Nano',
+    params: 60.03e6,
+    plotScore: 43.03,
+    scores: { lambada: 22.90, piqa: 59.25, winogrande: 51.54, arcEasy: 42.26, arcChallenge: 18.34, sciq: 63.90, mean6: 43.03 },
+    highlight: true,
+  },
+  {
+    label: 'G2 Nano',
+    params: 60e6,
+    plotScore: 44.59,
+    scores: { lambada: 24.37, piqa: 58.60, winogrande: 51.46, arcEasy: 44.11, arcChallenge: 19.11, sciq: 69.90, mean6: 44.59 },
+    highlight: true,
+  },
+  {
+    label: 'Pythia-70M',
+    params: 70e6,
+    plotScore: 31.60,
+    scores: { lambada: 4.83, piqa: 55.11, winogrande: 50.12, arcEasy: 29.50, arcChallenge: 19.45, hellaswag: 26.67, sciq: 35.50, mean7: 31.60 },
+  },
+  {
+    label: 'Pythia-70M-deduped',
+    params: 70e6,
+    plotScore: 38.00,
+    scores: { lambada: 19.00, piqa: 58.81, winogrande: 47.67, arcEasy: 38.22, arcChallenge: 15.61, hellaswag: 26.60, sciq: 60.10, mean7: 38.00 },
+  },
+  {
+    label: 'Boris-1.3-75M',
+    params: 77.4e6,
+    plotScore: 40.96,
+    scores: { lambada: 18.28, piqa: 59.58, winogrande: 51.70, arcEasy: 43.86, arcChallenge: 19.28, hellaswag: 27.20, sciq: 66.80, mean7: 40.96 },
+  },
+  {
+    label: 'Boris-125M',
+    params: 125e6,
+    plotScore: 42.37,
+    scores: { lambada: 23.15, piqa: 61.04, winogrande: 49.41, arcEasy: 46.72, arcChallenge: 20.31, hellaswag: 27.88, sciq: 68.10, mean7: 42.37 },
+  },
+  {
+    label: 'Boris-1.3-125M',
+    params: 125e6,
+    plotScore: 43.91,
+    scores: { lambada: 26.04, piqa: 62.13, winogrande: 52.33, arcEasy: 47.18, arcChallenge: 20.56, hellaswag: 28.09, sciq: 71.00, mean7: 43.91 },
+  },
+  {
+    label: 'Boris-1.7-D60M-n30M avec n-gram',
+    params: 90e6,
+    plotScore: 45.02,
+    scores: { lambada: 26.76, piqa: 61.81, winogrande: 51.38, arcEasy: 50.38, arcChallenge: 21.08, hellaswag: 29.27, sciq: 74.50, mean7: 45.02 },
+  },
+  {
+    label: 'Boris-1.7-D60M-n30M sans n-gram',
+    params: 60e6,
+    plotScore: 43.71,
+    scores: { lambada: 25.42, piqa: 60.55, winogrande: 50.12, arcEasy: 47.64, arcChallenge: 20.22, hellaswag: 28.99, sciq: 73.00, mean7: 43.71 },
+  },
+  {
+    label: 'Pythia-160M',
+    params: 162.3e6,
+    plotScore: 44.64,
+    scores: { lambada: 32.97, piqa: 62.40, winogrande: 51.54, arcEasy: 43.43, arcChallenge: 19.45, hellaswag: 28.39, sciq: 74.30, mean7: 44.64 },
+  },
+  {
+    label: 'Pythia-160M-deduped (1/7)',
+    params: 162.3e6,
+    partial: true,
+    scores: { lambada: 34.08 },
+  },
+  {
+    label: 'SmolLM2-135M (5/7 historique)',
+    params: 135e6,
+    plotScore: 51.36,
+    partial: true,
+    scores: { lambada: 42.83, piqa: 68.39, winogrande: 52.80, arcEasy: 64.39, arcChallenge: 28.41 },
+  },
+];
+
+---
+
+<Base
+  title="Accueil"
+  description="Laboratoire indépendant de petits modèles de langue entraînés from scratch. Poids ouverts, benchmarks honnêtes, matériel contraint."
+>
+  <!-- Hero : centré, typographie seule -->
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <h1 class="rise">
+        <span class="dim">Petits modèles.</span><br />Vraie recherche.
+      </h1>
+      <div class="hero-cta rise rise-1">
+        <a class="btn btn-primary" href="/labo/modeles">Voir les modèles</a>
+        <a class="btn btn-ghost" href="/labo/benchmarks">Lire les benchmarks</a>
+      </div>
+      <div class="model-menu-grid">
+        <a class="model-menu-item" href="/labo/modeles#g1-nano">
+          <span class="eyebrow" style="--c: var(--c-blue)">Modèle généraliste</span>
+          <h2>G1 Nano</h2>
+          <p>Contexte 2048 tokens et conversations multi-tour, à taille compacte.</p>
+          <span class="model-menu-more">Voir le modèle →</span>
+        </a>
+        <a class="model-menu-item" href="/labo/modeles#g2-nano">
+          <span class="eyebrow" style="--c: var(--c-orange)">Journal de labo</span>
+          <h2>G2 Nano</h2>
+          <p>Deux fois plus de tokens, gains faibles, résultats documentés sans promesse de victoire.</p>
+          <span class="model-menu-more">Voir le modèle →</span>
+        </a>
+        <a class="model-menu-item" href="/labo/modeles#g2-nano-safety">
+          <span class="eyebrow" style="--c: var(--c-yellow)">Sécurité</span>
+          <h2>G2 Nano Safety</h2>
+          <p>Juge ALLOW, REDACT ou BLOCK pour les messages sortants, avec filet déterministe.</p>
+          <span class="model-menu-more">Voir le modèle →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benchmarks teaser -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" style="--c: var(--c-blue)">Série G</p>
+        <h2>G0, G1 et G2, à taille nano.</h2>
+        <p>
+          Suite canonique de sept tâches, lm-evaluation-harness 0.4.11,
+          zero-shot, jeu complet. Les scores restent bruts et les évaluations
+          partielles sont signalées.
+        </p>
+      </div>
+      <div class="bench-split">
+        <ModelMap
+          points={benchRows
+            .filter(({ plotScore }) => plotScore !== undefined)
+            .map(({ label, params, plotScore, highlight, partial }) => ({
+              label,
+              params,
+              score: plotScore,
+              ours: highlight,
+              partial,
+            }))}
+        />
+        <p class="table-note">
+          Moyenne des benchmarks selon le nombre de paramètres.
+          <a href="/labo/benchmarks">Détails</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <SecurityShowcase />
+
+</Base>
+
+<style>
+  .hero {
+    min-height: calc(100svh - 69px);
+    display: flex;
+    align-items: center;
+    padding-block: clamp(3rem, 8vw, 5rem);
+  }
+
+  .hero-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: clamp(2rem, 5vw, 4rem);
+  }
+
+  .hero h1 {
+    margin-bottom: 2.4rem;
+  }
+
+  .hero h1 .dim {
+    color: var(--faint);
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .model-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    justify-content: center;
+    width: 100%;
+    margin-top: clamp(6rem, 12vw, 9rem);
+  }
+
+  .model-menu-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 190px;
+    padding: 1.5rem;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: rgb(255 255 255 / 0.42);
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .model-menu-item:hover {
+    text-decoration: none;
+  }
+
+  .model-menu-item .eyebrow {
+    margin-bottom: 1rem;
+  }
+
+  .model-menu-item h2 {
+    font-size: clamp(1.6rem, 3vw, 2.25rem);
+    margin-bottom: 0.7rem;
+  }
+
+  .model-menu-item p {
+    margin: 0;
+    align-self: stretch;
+    color: var(--faint);
+    font-size: 0.9rem;
+    line-height: 1.45;
+    max-width: none;
+    text-align: left;
+  }
+
+  .model-menu-more {
+    margin-top: 1.5rem;
+    font-weight: 500;
+    font-size: 0.92rem;
+  }
+
+  .bench-split {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-top: 2.5rem;
+  }
+
+  .table-note {
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+
+  @media (max-width: 900px) {
+    .model-menu-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .model-menu-grid {
+      grid-template-columns: 1fr;
+      max-width: 300px;
+    }
+
+  }
+</style>

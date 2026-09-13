@@ -1,0 +1,19 @@
+HTTP/2 200 
+accept-ranges: bytes
+x-build-commit: 672d4e0337e6ec7b452f5a3357c8bdc34ca06e17
+x-build-time: 2026-09-11T14:37:25-07:00
+x-frame-options: DENY
+x-request-id: abe743fc-289d-4ff6-9e89-0fc96d9d60bd
+content-length: 7487
+server: Google Frontend
+traceparent: 00-dfe105376dd332abb809d970bde5d55b-a4df72aac1f3b6f1-00
+x-cloud-trace-context: dfe105376dd332abb809d970bde5d55b/11880340419750639345
+via: 1.1 google
+date: Fri, 11 Sep 2026 21:44:26 GMT
+age: 72800
+last-modified: Sat, 22 Aug 2026 21:43:10 GMT
+etag: "255a0192cc7bcb4cbcb9dfa667937675"
+content-type: image/png
+cache-control: public,max-age=3600,must-revalidate
+alt-svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+

@@ -1,0 +1,19 @@
+HTTP/2 200 
+date: Sat, 12 Sep 2026 17:53:59 GMT
+content-type: image/x-icon
+last-modified: Sat, 12 Sep 2026 06:51:07 GMT
+etag: W/"6aa4f65b-1976"
+expires: Tue, 09 Sep 2036 17:53:59 GMT
+cache-control: max-age=315360000
+vary: Accept-Encoding, Accept, X-Requested-With
+server: github.com
+x-frame-options: DENY
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+accept-ranges: bytes
+set-cookie: _gh_sess=rN6HEwMJcwTQXv4T7BCnnhWTyLaY95b4RZjxVQRVnjN9QR4eKnWMI6Cdp5q2ofn%2BfHJet2E4ogIjxj05UngcdGmjvRvSbGn%2FlCVDH5LDnyl9Ub%2FFwGD4nuBFdf752AKRIBjQU85m4M9pEKLisFcNoCe805ZbFjHtudZBVSTRVQGx10PdMY9l19cNL3%2F8ZHS2kXkka80Vf837AyhyufpqKvVT1MXu2%2FFWvzWdFgF1mDPAnot7PgUu%2BKHiXhAKWV0Z0SNeVZVGsdiD814vHt0YJw%3D%3D--vBAmOZQUfY8MRS6p--Ep1ho4nLvoVg7uwmnNWePg%3D%3D; path=/; HttpOnly; secure; SameSite=Lax
+set-cookie: _octo=GH1.1.1201490679.1789235866; expires=Sun, 12 Sep 2027 17:57:46 GMT; domain=.github.com; path=/; secure; SameSite=Lax
+set-cookie: logged_in=no; expires=Sun, 12 Sep 2027 17:57:46 GMT; domain=.github.com; path=/; HttpOnly; secure; SameSite=Lax
+content-length: 6518
+x-github-request-id: E8A9:291BBC:D98775D:C6425FD:6AA5929A
+x-github-edge-region: fra
+

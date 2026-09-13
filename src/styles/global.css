@@ -1,0 +1,400 @@
+@import '@fontsource-variable/inter';
+@import '@fontsource/geist-mono/400.css';
+@import '@fontsource/geist-mono/500.css';
+
+/* ── Tokens — thème clair, couleurs variées et espacées ── */
+:root {
+  --bg: #fcfcfa;
+  --surface: #ffffff;
+  --surface-2: #f4f4f0;
+  --ink: #101012;
+  --muted: #5b5b61;
+  --line: rgb(0 0 0 / 0.09);
+  --line-strong: rgb(0 0 0 / 0.22);
+
+  /* Palette bake-off : fills du graphique, réutilisés partout. */
+  --c-blue: #4b8fd9;
+  --c-green: #b4d9a8;
+  --c-orange: #e8966c;
+  --c-yellow: #edd56a;
+  --c-gray: #8b8e93;
+  --faint: var(--c-gray);
+
+  --c-blue-ink: color-mix(in srgb, var(--c-blue) 52%, var(--ink));
+  --c-green-ink: color-mix(in srgb, var(--c-green) 28%, var(--ink));
+  --c-orange-ink: color-mix(in srgb, var(--c-orange) 42%, var(--ink));
+  --c-yellow-ink: color-mix(in srgb, var(--c-yellow) 32%, var(--ink));
+
+  --accent: var(--c-blue-ink);
+  --radius-card: 14px;
+  --font-sans: 'Inter Variable', Inter, system-ui, -apple-system, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --wrap: 1180px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Infobulles partagées — même rendu sur tous les graphiques. */
+  --tooltip-bg: #101012;
+  --tooltip-fg: #fcfcfa;
+  --tooltip-border: #5b5b61;
+  --tooltip-radius: 5px;
+  --tooltip-padding: 0.55rem 0.65rem;
+  --tooltip-font-size: 13px;
+  --tooltip-line-height: 1.35;
+  --tooltip-z: 1000;
+}
+
+/* ── Base ───────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Liens dans le texte courant : bleu bake-off, soulignés discrets. */
+p a,
+li a {
+  color: var(--c-blue-ink);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--c-blue) 55%, transparent);
+  transition: text-decoration-color 0.2s var(--ease);
+}
+
+p a:hover,
+li a:hover {
+  text-decoration-color: var(--c-blue);
+}
+
+/* Signature x.ai : jamais de gras, le tracking négatif fait la hiérarchie. */
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  margin: 0 0 0.5em;
+}
+
+h1 {
+  font-size: clamp(2.9rem, 7vw, 5.2rem);
+  letter-spacing: -0.035em;
+}
+
+h2 {
+  font-size: clamp(1.9rem, 3.8vw, 2.8rem);
+  letter-spacing: -0.03em;
+}
+
+h3 {
+  font-size: 1.25rem;
+  letter-spacing: -0.015em;
+}
+
+p {
+  margin: 0 0 1em;
+  max-width: 68ch;
+}
+
+code,
+pre,
+.mono {
+  font-family: var(--font-mono);
+}
+
+code {
+  font-size: 0.86em;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.1em 0.38em;
+}
+
+pre {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  padding: 1.1rem 1.25rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.65;
+}
+
+pre code {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+::selection {
+  background: var(--c-blue);
+  color: var(--bg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-blue);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ── Layout helpers ─────────────────────────────────────── */
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.section {
+  padding-block: clamp(3.5rem, 8vw, 6.5rem);
+}
+
+.section-head {
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+}
+
+.section-head p:not(.eyebrow) {
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+/* Eyebrow : la couleur arrive via --c, sinon gris neutre. */
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--c, var(--faint)) 68%, var(--ink));
+  margin-bottom: 1.1rem;
+}
+
+.lede {
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ── Buttons ────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.98rem;
+  line-height: 1;
+  padding: 0.95rem 1.6rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.25s var(--ease), background 0.25s var(--ease),
+    border-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+.btn:hover {
+  text-decoration: none;
+}
+
+.btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.btn-primary:hover {
+  background: #2c2c30;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.btn-ghost:hover {
+  border-color: var(--ink);
+}
+
+/* ── Badges : une couleur par statut ────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.32rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  background: transparent;
+  white-space: nowrap;
+}
+
+.badge-published {
+  background: color-mix(in srgb, var(--c-green) 48%, white);
+  border-color: color-mix(in srgb, var(--c-green) 72%, white);
+  color: var(--c-green-ink);
+}
+
+.badge-soon {
+  background: color-mix(in srgb, var(--c-orange) 42%, white);
+  border-color: color-mix(in srgb, var(--c-orange) 68%, white);
+  color: var(--c-orange-ink);
+}
+
+.badge-lab {
+  background: color-mix(in srgb, var(--c-yellow) 48%, white);
+  border-color: color-mix(in srgb, var(--c-yellow) 72%, white);
+  color: var(--c-yellow-ink);
+}
+
+/* ── Cards : accent via --c (filet supérieur coloré) ────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  padding: 1.75rem;
+  transition: transform 0.35s var(--ease), border-color 0.35s var(--ease),
+    box-shadow 0.35s var(--ease);
+}
+
+a.card {
+  text-decoration: none;
+}
+
+a.card:hover {
+  text-decoration: none;
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--c, #101012) 45%, white);
+  box-shadow: 0 12px 32px -18px color-mix(in srgb, var(--c, #101012) 45%, transparent);
+}
+
+/* ── Tables ─────────────────────────────────────────────── */
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  min-width: 720px;
+}
+
+table.data th,
+table.data td {
+  text-align: right;
+  padding: 0.8rem 1rem;
+  white-space: nowrap;
+}
+
+table.data th:first-child,
+table.data td:first-child {
+  text-align: left;
+}
+
+table.data thead th {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+  border-bottom: 1px solid var(--line);
+}
+
+table.data tbody tr + tr {
+  border-top: 1px solid var(--line);
+}
+
+table.data tbody tr:hover {
+  background: var(--surface-2);
+}
+
+table.data td.num {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* Meilleur score d'une colonne : sauge bake-off. */
+table.data td.best {
+  color: var(--c-green-ink);
+  font-weight: 500;
+}
+
+/* ── Entry animation ────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    animation: rise 0.7s var(--ease) both;
+  }
+
+  .rise-1 { animation-delay: 0.05s; }
+  .rise-2 { animation-delay: 0.15s; }
+  .rise-3 { animation-delay: 0.25s; }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

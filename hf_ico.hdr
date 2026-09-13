@@ -1,0 +1,23 @@
+HTTP/2 200 
+content-type: image/x-icon
+content-length: 205556
+date: Sat, 12 Sep 2026 11:03:58 GMT
+etag: W/"322f4-1a0907ec818"
+x-powered-by: huggingface-moon
+x-request-id: Root=1-6aa5319e-3062aa7976aa9f5d59af17da
+ratelimit: "pages";r=998;t=252
+ratelimit-policy: "fixed window";"pages";q=1000;w=300
+cross-origin-opener-policy: same-origin
+referrer-policy: strict-origin-when-cross-origin
+accept-ranges: bytes
+cache-control: max-age=31536000
+last-modified: Fri, 11 Sep 2026 12:43:43 GMT
+x-cache: Hit from cloudfront
+via: 1.1 aeaf6805e1f7af40289dbac799f9b670.cloudfront.net (CloudFront)
+x-amz-cf-pop: CDG52-P4
+alt-svc: h3=":443"; ma=86400
+x-amz-cf-id: zShNRfI7E6bFi4S6miptIbC3Ucd4FyD7sGyNBVL4oGEdHax0nqghYQ==
+age: 24827
+strict-transport-security: max-age=31536000
+vary: Origin
+

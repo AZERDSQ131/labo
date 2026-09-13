@@ -1,0 +1,254 @@
+---
+/**
+ * Une tâche, cinq barres : les modèles du labo, échelle 0–100 honnête,
+ * ligne de hasard en pointillés. Même langage visuel que le bake-off
+ * sécurité de la landing (barres CSS, infobulle au survol, tableau sr-only).
+ */
+interface Bar {
+  label: string;
+  short: string;
+  color: string;
+  value: number;
+  /** Efficacité (points par M de paramètres) pour le mode « Par taille ». null = n/a. */
+  alt?: number | null;
+}
+
+interface Props {
+  title: string;
+  desc: string;
+  bars: Bar[];
+}
+
+const { title, desc, bars } = Astro.props;
+
+const fmt = (v: number) => v.toFixed(2).replace('.', ',');
+const altMax = Math.max(...bars.map((b) => b.alt ?? -1), 0);
+const hasAlt = bars.some((b) => b.alt !== undefined && b.alt !== null);
+const tip0 = (b: Bar) => `${b.label} · ${fmt(b.value)} %`;
+---
+
+<figure class="task" data-maxalt={hasAlt ? altMax : undefined} data-unit={hasAlt ? 'pts/M' : undefined}>
+  <figcaption>
+    <h3>{title}</h3>
+    <p class="desc">{desc}</p>
+  </figcaption>
+  <div class="plot" role="img" aria-label={`${title} : ${bars.map((b) => `${b.label} ${fmt(b.value)} pour cent`).join(', ')}`}>
+    <div class="bars">
+      <div class="y" aria-hidden="true">
+        <span style="--y:100">100</span>
+        <span style="--y:50">50</span>
+      </div>
+      <div class="grid" aria-hidden="true">
+        <i style="--y:100"></i>
+        <i style="--y:50"></i>
+      </div>
+      {bars.map((b, i) => (
+        <div class="col" data-v={b.value} data-alt={b.alt ?? ''} data-label={b.label}>
+          <span
+            class="bar"
+            style={`height:${b.value}%;--c:${b.color};--i:${i}`}
+            data-tooltip={tip0(b)}
+            data-tip0={tip0(b)}
+          ></span>
+          <span class="val mono" style={`bottom:calc(${b.value}% + 0.35rem)`}>{fmt(b.value)}</span>
+        </div>
+      ))}
+    </div>
+    <div class="xlabs" aria-hidden="true">
+      {bars.map((b) => <span class="xlab" data-xlab={b.label}>{b.short}</span>)}
+    </div>
+  </div>
+  <table class="sr-only">
+    <caption>{title} — accuracies brutes (%)</caption>
+    <thead>
+      <tr>
+        <th>Modèle</th>
+        {bars.map((b) => <th>{b.label}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">acc</th>
+        {bars.map((b) => <td>{fmt(b.value)}</td>)}
+      </tr>
+    </tbody>
+  </table>
+</figure>
+
+<style>
+  .task {
+    margin: 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    padding: 1.5rem 1.5rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .task h3 {
+    margin: 0 0 0.25rem;
+  }
+
+  .desc {
+    margin: 0 0 1rem;
+    color: var(--muted);
+    font-size: 0.92rem;
+    max-width: none;
+  }
+
+  .plot {
+    position: relative;
+    padding-left: 2.2rem;
+  }
+
+  .bars {
+    --head: 2.5rem;
+    position: relative;
+    display: flex;
+    gap: 0.4rem;
+    height: calc(11rem + var(--head));
+    padding-top: var(--head);
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .y {
+    position: absolute;
+    top: var(--head);
+    bottom: 0;
+    left: -2.2rem;
+    width: 2rem;
+  }
+
+  .y span {
+    position: absolute;
+    right: 0.4rem;
+    top: calc((100 - var(--y)) * 1%);
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .grid {
+    position: absolute;
+    top: var(--head);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    pointer-events: none;
+  }
+
+  .grid i {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc((100 - var(--y)) * 1%);
+    border-top: 1px solid var(--line);
+  }
+
+  .col {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+  }
+
+  .val {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin-inline: auto;
+    width: clamp(26px, 5vw, 44px);
+    min-height: 3px;
+    background: var(--c);
+    border-radius: 3px 3px 0 0;
+    transform-origin: bottom;
+  }
+
+  .bar::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 0.55rem);
+    z-index: 2;
+    padding: 0.4rem 0.55rem;
+    border-radius: 5px;
+    background: var(--tooltip-bg);
+    color: var(--tooltip-fg);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, 0.25rem);
+    transition: opacity 120ms ease, transform 120ms ease;
+  }
+
+  .bar:hover::after {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  .bar:hover {
+    z-index: 10;
+  }
+
+  .xlabs {
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  .xlab {
+    flex: 1;
+    min-width: 0;
+    margin-top: 0.5rem;
+    height: 1.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.25;
+  }
+
+  .task.is-alt .y,
+  .task.is-alt .grid {
+    display: none;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .bar {
+      animation: task-rise 0.7s var(--ease) both;
+      animation-delay: calc(var(--i) * 60ms);
+    }
+  }
+
+  @keyframes task-rise {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+</style>

@@ -1,0 +1,375 @@
+---
+import { safetyBakeoff } from '../data/siteData';
+
+const fmt = (v: number) => v.toFixed(1).replace('.', ',');
+const yTicks = [100, 50];
+const groupDescriptions = {
+  allow: 'Mesure la capacité à laisser passer correctement les messages inoffensifs.',
+  redact: 'Mesure la capacité à masquer les informations sensibles sans bloquer tout le message.',
+  block: 'Mesure la capacité à bloquer correctement les messages dangereux ou malveillants.',
+  decision: 'Score global de la décision ALLOW, REDACT ou BLOCK sur l’ensemble du hold-out.',
+};
+---
+
+<section class="section security-showcase no-rule" id="securite">
+  <div class="wrap">
+    <div class="security-head">
+      <p class="eyebrow" style="--c: var(--c-yellow)">Sécurité</p>
+      <h2>G2 Nano Safety : 60 M, 50× plus léger.</h2>
+      <p>
+        G2 Nano Safety filtre les messages sortants avant qu’ils
+        n’atteignent l’agent. Le voici face aux filtres open-weights, sur
+        le hold-out (46 laisser, 82 masquer, 72 bloquer) :
+        76,5 % de décisions correctes contre 66,5 % pour Shieldstral Q4.
+      </p>
+    </div>
+
+    <figure class="bakeoff">
+      <figcaption class="bakeoff-title">Décisions correctes</figcaption>
+      <ul class="bakeoff-legend">
+        {
+          safetyBakeoff.models.map((model) => (
+            <li>
+              <span class="swatch" style={`background:${model.color}`}></span>
+              {model.name}
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="bakeoff-plot" role="img" aria-labelledby="bakeoff-caption">
+        <p id="bakeoff-caption" class="sr-only">
+          Pourcentage de décisions correctes sur l’ensemble du hold-out. G2 Nano Safety :
+          laisser 97,8, masquer 43,9, bloquer 100, décision 76,5. Shieldstral
+          Q4 : 13,0, 98,8, 63,9, 66,5. GLiNER edge : 0, 87,8, 63,9, 59,0.
+          GLiNER small : 30,4, 75,6, 56,9, 58,5. Regex naïf : 56,5, 0, 100,
+          49,0.
+        </p>
+        <div class="bakeoff-y" aria-hidden="true">
+          {yTicks.map((tick) => <span style={`--y:${tick}`}>{tick}</span>)}
+        </div>
+        <div class="bakeoff-grid" aria-hidden="true">
+          {yTicks.map((tick) => <i style={`--y:${tick}`}></i>)}
+        </div>
+        <div class="bakeoff-groups">
+          <div class="bakeoff-bars-row">
+            {
+              safetyBakeoff.groups.map((group) => (
+                <div class="bakeoff-bars">
+                  {safetyBakeoff.models.map((model, i) => {
+                    const value = group.scores[model.id];
+                    return (
+                      <span
+                        class:list={['bakeoff-bar', { zero: value === 0 }]}
+                        style={`height:${value}%;--c:${model.color};--i:${i}`}
+                        data-tooltip={`${model.name} · ${fmt(value)} %`}
+                      ></span>
+                    );
+                  })}
+                </div>
+              ))
+            }
+          </div>
+          <div class="bakeoff-xlabels">
+            {safetyBakeoff.groups.map((group) => (
+              <span class="bakeoff-xlabel">
+                {group.label}
+                <span class="bakeoff-info-wrap">
+                  <span
+                    class="bakeoff-info"
+                    tabindex="0"
+                    aria-label={`À propos de ${group.label}`}
+                  >?</span>
+                  <span class="bakeoff-info-tooltip" role="tooltip">
+                    {groupDescriptions[group.key]}
+                  </span>
+                </span>
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <table class="sr-only">
+        <caption>G2 Nano Safety face aux références (%)</caption>
+        <thead>
+          <tr>
+            <th>Modèle</th>
+            {safetyBakeoff.groups.map((group) => <th>{group.label}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {
+            safetyBakeoff.models.map((model) => (
+              <tr>
+                <th scope="row">{model.name}</th>
+                {safetyBakeoff.groups.map((group) => (
+                  <td>{fmt(group.scores[model.id])}</td>
+                ))}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .security-head {
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+  }
+
+  .security-head h2 {
+    margin-bottom: 0.5em;
+  }
+
+  .security-head p:not(.eyebrow) {
+    margin: 0;
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 56ch;
+  }
+
+  .bakeoff {
+    margin: 0;
+  }
+
+  .bakeoff-title {
+    font-size: 1.75rem;
+    font-weight: 650;
+    letter-spacing: -0.035em;
+    margin: 0 0 1.15rem;
+  }
+
+  .bakeoff-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.35rem;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    list-style: none;
+    font-size: 0.92rem;
+    color: var(--muted);
+  }
+
+  .bakeoff-legend li {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .swatch {
+    width: 0.72rem;
+    height: 0.72rem;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .bakeoff-plot {
+    position: relative;
+    padding: 0.25rem 0 0 2.6rem;
+  }
+
+  .bakeoff-y {
+    position: absolute;
+    inset: 0 auto 2.15rem 0;
+    width: 2.35rem;
+  }
+
+  .bakeoff-y span {
+    position: absolute;
+    right: 0.45rem;
+    top: calc((100 - var(--y)) * 1%);
+    transform: translateY(-50%);
+    font-size: 0.85rem;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bakeoff-grid {
+    position: absolute;
+    inset: 0 0 2.15rem 2.6rem;
+    pointer-events: none;
+  }
+
+  .bakeoff-grid i {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc((100 - var(--y)) * 1%);
+    border-top: 1px solid var(--line);
+  }
+
+  .bakeoff-bars-row,
+  .bakeoff-xlabels {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: clamp(1rem, 4vw, 3rem);
+  }
+
+  .bakeoff-xlabels {
+    position: relative;
+    z-index: 5;
+  }
+
+  .bakeoff-bars-row {
+    height: 18.5rem;
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .bakeoff-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 5px;
+    height: 100%;
+    min-width: 0;
+  }
+
+  .bakeoff-bar {
+    position: relative;
+    width: clamp(14px, 2.4vw, 28px);
+    min-height: 3px;
+    background: var(--c);
+    border-radius: 2px 2px 0 0;
+    outline: none;
+    transform-origin: bottom;
+  }
+
+  .bakeoff-bar.zero {
+    background: transparent;
+  }
+
+  .bakeoff-bar::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 0.55rem);
+    z-index: 2;
+    padding: 0.4rem 0.55rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 5px;
+    background: var(--ink);
+    color: var(--bg);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, 0.25rem);
+    transition: opacity 120ms ease, transform 120ms ease;
+  }
+
+  .bakeoff-bar:hover::after {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  .bakeoff-bar:hover {
+    z-index: 10;
+  }
+
+  .bakeoff-xlabel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    margin-top: 0.85rem;
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  .bakeoff-info-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .bakeoff-info {
+    display: inline-grid;
+    place-items: center;
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: 0.66rem;
+    font-weight: 650;
+    line-height: 1;
+    text-align: center;
+    cursor: help;
+  }
+
+  .bakeoff-info-tooltip {
+    position: absolute;
+    top: calc(100% + 0.55rem);
+    left: 50%;
+    z-index: var(--tooltip-z);
+    width: min(18rem, calc(100vw - 2rem));
+    padding: var(--tooltip-padding);
+    border: 1px solid var(--tooltip-border);
+    border-radius: var(--tooltip-radius);
+    background: var(--tooltip-bg);
+    color: var(--tooltip-fg);
+    font-family: var(--font-sans);
+    font-size: var(--tooltip-font-size);
+    font-weight: 400;
+    line-height: var(--tooltip-line-height);
+    text-align: left;
+    white-space: normal;
+    pointer-events: none;
+    transform: translateX(-50%);
+    display: none;
+  }
+
+  .bakeoff-info:hover,
+  .bakeoff-info:focus-visible {
+    z-index: 31;
+    color: var(--ink);
+  }
+
+  .bakeoff-info-wrap:hover .bakeoff-info-tooltip,
+  .bakeoff-info:focus-visible + .bakeoff-info-tooltip {
+    display: block;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .bakeoff-bar {
+      animation: bake-rise 0.7s var(--ease) both;
+      animation-delay: calc(var(--i) * 45ms);
+    }
+  }
+
+  @keyframes bake-rise {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .bakeoff-plot {
+      overflow-x: auto;
+      padding-left: 2.1rem;
+    }
+
+    .bakeoff-groups {
+      min-width: 36rem;
+    }
+  }
+</style>

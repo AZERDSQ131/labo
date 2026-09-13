@@ -1,0 +1,123 @@
+---
+const nav = [
+  { href: '/labo/', label: 'Accueil' },
+  { href: '/labo/modeles', label: 'Modèles' },
+  { href: '/labo/benchmarks', label: 'Benchmarks' },
+  { href: '/labo/recherche', label: 'Recherche' },
+  { href: '/labo/liens', label: 'Liens' },
+];
+
+const path = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="wrap bar">
+    <nav aria-label="Navigation principale">
+      <ul>
+        {
+          nav.map((item) => {
+            const isActive = item.href === '/labo/' ? path === '/labo/' : path.startsWith(item.href);
+            return (
+              <li>
+                <a
+                  href={item.href}
+                  aria-current={isActive ? 'page' : undefined}
+                  class:list={[{ active: isActive }]}
+                >
+                  {item.label}
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector('.site-header');
+
+  if (header) {
+    const updateHeaderState = () => {
+      header.classList.toggle('is-scrolled', window.scrollY > 0);
+    };
+
+    updateHeaderState();
+    window.addEventListener('scroll', updateHeaderState, { passive: true });
+  }
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgb(252 252 250 / 0.78);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .site-header::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    background: var(--line);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.7s var(--ease);
+  }
+
+  .site-header.is-scrolled::after {
+    opacity: 1;
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 68px;
+  }
+
+  nav ul {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+  }
+
+  nav a {
+    display: inline-block;
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: color 0.2s var(--ease), background 0.2s var(--ease);
+  }
+
+  nav a:hover {
+    color: var(--ink);
+    background: var(--surface-2);
+  }
+
+  nav a.active {
+    color: var(--c-blue-ink);
+    background: color-mix(in srgb, var(--c-blue) 16%, white);
+  }
+
+  @media (max-width: 720px) {
+    .bar {
+      height: auto;
+      padding-block: 0.7rem;
+    }
+  }
+</style>

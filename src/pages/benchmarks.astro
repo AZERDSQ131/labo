@@ -1,0 +1,374 @@
+---
+import Base from '../layouts/Base.astro';
+import ModelMap from '../components/ModelMap.astro';
+import TaskBars from '../components/TaskBars.astro';
+import { labRows, peerRows, taskFigures } from '../data/benchmarks';
+
+// Sélection iso-taille (60–77 M) : notre instruct face à ses vrais pairs.
+const selection = [
+  { label: 'G2-nano-instruct', short: 'G2 inst.', color: 'var(--c-blue)', ours: true },
+  { label: 'Ronan-1.3-75M', short: 'Ronan 75M', color: 'var(--c-orange)' },
+  { label: 'Pythia-70M', short: 'Pythia 70M', color: 'var(--c-yellow)' },
+  { label: 'Pythia-70M-deduped', short: 'Pythia 70M-d', color: 'var(--c-gray)' },
+];
+
+const allRows = [...labRows, ...peerRows];
+const scoreOf = (label: string, key: string) =>
+  allRows.find((r) => r.label === label)?.scores[key as keyof typeof allRows[number]['scores']] as number;
+
+// Efficacité : points par million de paramètres. null = taille inconnue ou n/a.
+const paramsOf = (label: string) =>
+  allRows.find((r) => r.label === label)?.paramsM ?? null;
+const effOf = (label: string, value: number) => {
+  const p = paramsOf(label);
+  return p ? value / p : null;
+};
+
+const mapPoints = [...labRows, ...peerRows]
+  .filter((r) => r.scores.mean7 !== undefined)
+  .map((r) => ({
+    label: r.label,
+    params: r.paramsM * 1e6,
+    score: r.scores.mean7 as number,
+    ours: (r.highlight ?? false) || undefined,
+  }));
+
+// Hold-out G2 Nano Security (Jetson 2026-09-12).
+// Source : G/G2-nano-safety/benchmark.md § « Hold-out contextuel 200 ».
+// Tailles (M de paramètres) pour le mode « Par taille ».
+// G2 60 M et Shieldstral 3 B : cf. G/G2-nano-safety/benchmark.md.
+// GLiNER edge/small : comptage exact au paramètre près (torch numel)
+// des checkpoints benchés, le 2026-09-13 sur Jetson :
+// edge (knowledgator/gliner-pii-edge-v1.0) = 45 177 219,
+// small (knowledgator/gliner-pii-small-v1.0) = 81 537 283.
+// Regex naïf : règles, 0 paramètre → hors mode Par taille.
+const safetyParams: Record<string, number | null> = {
+  'G2-nano-safety': 60,
+  'Shieldstral Q4': 3000,
+  'GLiNER edge': 45.2,
+  'GLiNER small': 81.5,
+  'Regex naïf': null,
+};
+const safetyEff = (label: string, value: number) => {
+  const p = safetyParams[label];
+  return p ? value / p : null;
+};
+
+const safetySelection = [
+  { label: 'G2-nano-safety', short: 'G2 safety', color: 'var(--c-blue)', ours: true },
+  { label: 'Shieldstral Q4', short: 'Shieldstral', color: 'var(--c-green)' },
+  { label: 'GLiNER edge', short: 'GLiNER edge', color: 'var(--c-orange)' },
+  { label: 'GLiNER small', short: 'GLiNER small', color: 'var(--c-yellow)' },
+  { label: 'Regex naïf', short: 'Regex', color: 'var(--c-gray)' },
+];
+
+const safetyFigures = [
+  {
+    title: 'Décision',
+    desc: 'La bonne case : laisser, masquer ou bloquer.',
+    values: { 'G2-nano-safety': 76.5, 'Shieldstral Q4': 66.5, 'GLiNER edge': 59.0, 'GLiNER small': 58.5, 'Regex naïf': 49.0 },
+  },
+  {
+    title: 'Laisser',
+    desc: 'ALLOW : 46 cas où le message doit partir tel quel.',
+    values: { 'G2-nano-safety': 97.8, 'Shieldstral Q4': 13.0, 'GLiNER edge': 0, 'GLiNER small': 30.4, 'Regex naïf': 56.5 },
+  },
+  {
+    title: 'Masquer',
+    desc: 'REDACT : 82 cas où il faut caviarder — notre point faible.',
+    values: { 'G2-nano-safety': 43.9, 'Shieldstral Q4': 98.8, 'GLiNER edge': 87.8, 'GLiNER small': 75.6, 'Regex naïf': 0 },
+  },
+  {
+    title: 'Bloquer',
+    desc: 'BLOCK : 72 cas où rien ne doit sortir.',
+    values: { 'G2-nano-safety': 100, 'Shieldstral Q4': 63.9, 'GLiNER edge': 63.9, 'GLiNER small': 56.9, 'Regex naïf': 100 },
+  },
+];
+---
+
+<Base
+  title="Benchmarks"
+  description="Sept illustrations, des scores bruts : la suite canonique du laboratoire face aux références open-weight."
+>
+  <section class="section page-head">
+    <div class="wrap">
+      <h1>Benchmarks</h1>
+      <p class="lede">
+        Notre instruct face aux références open-weight, tâche par tâche.
+      </p>
+      <ul class="legend">
+        {selection.map((s) => (
+          <li>
+            <span class="swatch" style={`background:${s.color}`}></span>
+            {s.label}
+          </li>
+        ))}
+      </ul>
+      <nav class="toc" aria-label="Sommaire de la page">
+        <a href="#carte">1. Taille / score</a>
+        <a href="#taches">2. Les sept tâches</a>
+        <a href="#security">3. G2 Nano Security</a>
+      </nav>
+    </div>
+  </section>
+
+  <section class="section overview">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="carte">1. Taille / score moyen.</h2>
+        <p>
+          Moyenne 7 tâches selon la taille. Nos checkpoints en noir.
+        </p>
+      </div>
+      <ModelMap points={mapPoints} />
+    </div>
+  </section>
+
+  <section class="section tasks">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="taches">2. Les sept tâches.</h2>
+        <p>
+          Même catégorie de taille : 60 à 77 M de paramètres.
+        </p>
+        <div class="mode-toggle" data-mode-toggle>
+          <button type="button" class="is-active" data-mode="brut">Brut</button>
+          <button type="button" data-mode="taille">Par taille</button>
+        </div>
+      </div>
+      <div class="task-grid">
+        {taskFigures.map((t) => (
+          <TaskBars
+            title={t.title}
+            desc={t.desc}
+            bars={selection
+              .map((s) => {
+                const value = scoreOf(s.label, t.key);
+                return {
+                  label: s.label,
+                  short: s.short,
+                  color: s.color,
+                  value,
+                  alt: effOf(s.label, value),
+                };
+              })
+              .sort((a, b) => b.value - a.value)}
+          />
+        ))}
+      </div>
+      <p class="note">
+        Protocole : lm-evaluation-harness 0.4.11, zero-shot, jeux complets,
+        Jetson. Références remesurées par le labo le 2026-09-12.
+      </p>
+    </div>
+  </section>
+
+  <section class="section safety">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="security">3. G2 Nano Security.</h2>
+        <p>
+          Laisser, masquer ou bloquer : G2 Nano Security
+          face aux références.
+        </p>
+        <ul class="legend">
+          {safetySelection.map((s) => (
+            <li>
+              <span class="swatch" style={`background:${s.color}`}></span>
+              {s.label}
+            </li>
+          ))}
+        </ul>
+        <div class="mode-toggle" data-mode-toggle>
+          <button type="button" class="is-active" data-mode="brut">Brut</button>
+          <button type="button" data-mode="taille">Par taille</button>
+        </div>
+      </div>
+      <div class="task-grid">
+        {safetyFigures.map((t) => (
+          <TaskBars
+            title={t.title}
+            desc={t.desc}
+            bars={safetySelection
+              .map((s) => {
+                const value = t.values[s.label as keyof typeof t.values];
+                return {
+                  label: s.label,
+                  short: s.short,
+                  color: s.color,
+                  value,
+                  alt: safetyEff(s.label, value),
+                };
+              })
+              .sort((a, b) => b.value - a.value)}
+          />
+        ))}
+      </div>
+      <p class="note">
+        Protocole : 46 ALLOW, 82 REDACT, 72 BLOCK, 128 EN / 72 FR,
+        Jetson, campagne du 2026-09-12. Fuite 4,0 %, faux zèle 0,5 %.
+        Réserve honnête : les 39 cas historiques font partie du hold-out et ont
+        servi à sélectionner le modèle — élargissement, pas hold-out pur
+        pour nous. REDACT 43,9 % : le point faible, Shieldstral fait
+        l'inverse (98,8 % REDACT, 13,0 % ALLOW) — il sur-masque.
+        En Par taille : Regex naïf (règles, 0 paramètre) n'est pas classé.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const fmt2 = (v) => v.toFixed(2).replace('.', ',');
+  document.querySelectorAll('[data-mode-toggle]').forEach((toggle) => {
+    const section = toggle.closest('section');
+    if (!section) return;
+    toggle.addEventListener('click', (event) => {
+      const target = event.target;
+      const btn = target instanceof Element ? target.closest('button') : null;
+      if (!btn || btn.classList.contains('is-active')) return;
+      toggle.querySelectorAll('button').forEach((b) => b.classList.toggle('is-active', b === btn));
+      const alt = btn.dataset.mode === 'taille';
+      section.querySelectorAll('figure.task').forEach((fig) => {
+        fig.classList.toggle('is-alt', alt);
+        const unit = fig.dataset.unit || '';
+        const maxAlt = parseFloat(fig.dataset.maxalt || '0');
+        const barsBox = fig.querySelector('.bars');
+        const cols = Array.from(fig.querySelectorAll('.col'));
+        const num = (c) => (alt ? parseFloat(c.dataset.alt) : parseFloat(c.dataset.v));
+        cols.sort((a, b) => {
+          const va = num(a);
+          const vb = num(b);
+          return (Number.isNaN(vb) ? -1 : vb) - (Number.isNaN(va) ? -1 : va);
+        });
+        cols.forEach((c) => barsBox.appendChild(c));
+        const xlabsBox = fig.querySelector('.xlabs');
+        if (xlabsBox) {
+          const xlabs = Array.from(xlabsBox.children);
+          cols.forEach((c) => {
+            const x = xlabs.find((el) => el.dataset.xlab === c.dataset.label);
+            if (x) xlabsBox.appendChild(x);
+          });
+        }
+        cols.forEach((c) => {
+          const bar = c.querySelector('.bar');
+          const val = c.querySelector('.val');
+          const label = c.dataset.label || '';
+          const v = parseFloat(c.dataset.v);
+          const a = parseFloat(c.dataset.alt);
+          if (alt) {
+            if (Number.isNaN(a)) {
+              bar.style.height = '0%';
+              val.style.bottom = 'calc(0% + 0.35rem)';
+              val.textContent = '—';
+              bar.setAttribute('data-tooltip', label + ' · taille n/a');
+            } else {
+              const h = maxAlt > 0 ? (a / maxAlt) * 100 : 0;
+              bar.style.height = h + '%';
+              val.style.bottom = 'calc(' + h + '% + 0.35rem)';
+              val.textContent = fmt2(a);
+              bar.setAttribute('data-tooltip', label + ' · ' + fmt2(a) + ' ' + unit);
+            }
+          } else {
+            bar.style.height = v + '%';
+            val.style.bottom = 'calc(' + v + '% + 0.35rem)';
+            val.textContent = fmt2(v);
+            bar.setAttribute('data-tooltip', bar.dataset.tip0 || '');
+          }
+        });
+      });
+    });
+  });
+</script>
+
+<style>
+  .page-head {
+    padding-bottom: 0;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.35rem;
+    margin: 1.25rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.92rem;
+    color: var(--muted);
+  }
+
+  .legend li {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .swatch {
+    width: 0.72rem;
+    height: 0.72rem;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.35rem;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+
+  .section-head h2[id] {
+    scroll-margin-top: 5.5rem;
+  }
+
+  .mode-toggle {
+    display: inline-flex;
+    gap: 2px;
+    margin-top: 1.25rem;
+    padding: 2px;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+  }
+
+  .mode-toggle button {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 0.4rem 0.95rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .mode-toggle button.is-active {
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .overview {
+    padding-bottom: 0;
+  }
+
+  .task-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .note {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: var(--muted);
+    max-width: none;
+  }
+
+  @media (max-width: 900px) {
+    .task-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
