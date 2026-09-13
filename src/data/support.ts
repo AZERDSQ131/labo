@@ -9,3 +9,15 @@ export const support = {
   donations: 5,
   updated: '2026-09-13',
 };
+
+/**
+ * Donateurs publics (noms + montants visibles par tous sur la page
+ * GoFundMe, aucun anonyme). Relevé le 2026-09-13, trié par montant.
+ */
+export const donors: Array<{ name: string; eur: number }> = [
+  { name: 'William Osborne', eur: 86 },
+  { name: 'Olivier Krzeszowiak', eur: 50 },
+  { name: 'Ahmet Ipkin', eur: 20 },
+  { name: 'Teunis Mulder', eur: 20 },
+  { name: 'Piotr Andruszkow', eur: 5 },
+];

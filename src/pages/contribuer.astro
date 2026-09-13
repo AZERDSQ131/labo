@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { externalLinks } from '../data/siteData';
-import { support } from '../data/support';
+import { support, donors } from '../data/support';
 
 const pct = Math.min(100, (support.raisedEur / support.goalEur) * 100);
 const fmtEur = (v: number) => v.toLocaleString('fr-FR').replace(/,/g, ' ') + ' €';
@@ -50,20 +50,16 @@ const fmtEur = (v: number) => v.toLocaleString('fr-FR').replace(/,/g, ' ') + ' �
 
   <section class="section">
     <div class="wrap">
-      <h2>Usage des fonds</h2>
-      <div class="use-grid">
-        <div class="card use-card" style="--c: var(--c-blue)">
-          <h3>Calcul</h3>
-          <p>Heures GPU pour les pré-entraînements et les évaluations (cloud type Vast.ai, Jetson local).</p>
-        </div>
-        <div class="card use-card" style="--c: var(--c-green)">
-          <h3>Matériel</h3>
-          <p>Stockage des checkpoints et des données (NAS, SSD), entretien du Jetson.</p>
-        </div>
-        <div class="card use-card" style="--c: var(--c-yellow)">
-          <h3>Ouverture</h3>
-          <p>Frais de publication et d'hébergement : ce site, les modèles, la documentation.</p>
-        </div>
+      <h2>Ils ont donné</h2>
+      <div class="card donor-card">
+        <ul class="donor-list">
+          {donors.map((d) => (
+            <li>
+              <span>{d.name}</span>
+              <span class="mono donor-amount">{fmtEur(d.eur)}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   </section>
@@ -132,30 +128,38 @@ const fmtEur = (v: number) => v.toLocaleString('fr-FR').replace(/,/g, ' ') + ' �
     color: var(--faint);
   }
 
-  .use-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.25rem;
+  .donor-card {
+    padding: 0.5rem 1.75rem;
   }
 
-  .use-card h3 {
-    margin: 0 0 0.4rem;
-  }
-
-  .use-card p {
+  .donor-list {
+    list-style: none;
     margin: 0;
+    padding: 0;
+  }
+
+  .donor-list li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 0;
+  }
+
+  .donor-list li + li {
+    border-top: 1px solid var(--line);
+  }
+
+  .donor-amount {
     color: var(--muted);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
   }
 
   @media (max-width: 720px) {
     .gauge-top {
       flex-direction: column;
       align-items: flex-start;
-    }
-
-    .use-grid {
-      grid-template-columns: 1fr;
     }
   }
 </style>
