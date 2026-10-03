@@ -46,10 +46,6 @@ const path = Astro.url.pathname;
         }
       </ul>
     </nav>
-    <button id="theme-toggle" type="button" aria-label="Basculer en thème sombre" aria-pressed="false" title="Thème clair / sombre">
-      <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"></path></svg>
-      <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"></path></svg>
-    </button>
   </div>
 </header>
 
@@ -65,20 +61,6 @@ const path = Astro.url.pathname;
     window.addEventListener('scroll', updateHeaderState, { passive: true });
   }
 
-  const toggle = document.getElementById('theme-toggle');
-  const root = document.documentElement;
-  const syncToggle = () => {
-    const isDark = root.dataset.theme === 'dark';
-    if (toggle) {
-      toggle.setAttribute('aria-pressed', String(isDark));
-      toggle.setAttribute(
-        'aria-label',
-        isDark ? 'Basculer en thème clair' : 'Basculer en thème sombre'
-      );
-    }
-  };
-
-  syncToggle();
   const menuToggle = document.getElementById('menu-toggle');
   const siteNav = document.getElementById('site-nav');
   const syncMenu = (open) => {
@@ -98,22 +80,6 @@ const path = Astro.url.pathname;
     });
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') syncMenu(false);
-    });
-  }
-  if (toggle) {
-    toggle.addEventListener('click', () => {
-      const isDark = root.dataset.theme === 'dark';
-      if (isDark) {
-        delete root.dataset.theme;
-      } else {
-        root.dataset.theme = 'dark';
-      }
-      try {
-        localStorage.setItem('labo-theme', isDark ? 'light' : 'dark');
-      } catch {
-        /* stockage indisponible */
-      }
-      syncToggle();
     });
   }
 </script>
@@ -256,33 +222,4 @@ const path = Astro.url.pathname;
     }
   }
 
-  #theme-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 999px;
-    border: 1px solid var(--line-strong);
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
-  }
-
-  #theme-toggle:hover {
-    color: var(--ink);
-  }
-
-  #theme-toggle .icon-moon {
-    display: none;
-  }
-
-  :global(html[data-theme="dark"]) #theme-toggle .icon-moon {
-    display: block;
-  }
-
-  :global(html[data-theme="dark"]) #theme-toggle .icon-sun {
-    display: none;
-  }
 </style>
