@@ -1,5 +1,6 @@
 ---
 import { externalLinks } from '../data/siteData';
+const base = (import.meta.env.BASE_URL.endsWith("/") ? import.meta.env.BASE_URL.slice(0, -1) : import.meta.env.BASE_URL) || "";
 ---
 
 <footer class="site-footer">
@@ -12,16 +13,16 @@ import { externalLinks } from '../data/siteData';
     </div>
     <nav aria-label="Modèles" class="col">
       <p class="col-title">Modèles</p>
-      <a href="/labo/modeles#g1-nano">G1 Nano</a>
-      <a href="/labo/modeles#g0-nano">G0 Nano</a>
-      <a href="/labo/modeles#g2-nano">G2 Nano</a>
-      <a href="/labo/modeles#g2-nano-safety">G2 Nano Safety</a>
+      <a href={`${base}/modeles#g1-nano`}">G1 Nano</a>
+      <a href={`${base}/modeles#g0-nano`}">G0 Nano</a>
+      <a href={`${base}/modeles#g2-nano`}">G2 Nano</a>
+      <a href={`${base}/modeles#g2-nano-safety`}">G2 Nano Safety</a>
     </nav>
     <nav aria-label="Projet" class="col">
       <p class="col-title">Projet</p>
-      <a href="/labo/benchmarks">Benchmarks</a>
-      <a href="/labo/recherche">Recherche</a>
-      <a href="/labo/liens">Liens</a>
+      <a href={`${base}/benchmarks`}">Benchmarks</a>
+      <a href={`${base}/recherche`}">Recherche</a>
+      <a href={`${base}/liens`}">Liens</a>
     </nav>
     <nav aria-label="Externe" class="col">
       <p class="col-title">Externe</p>

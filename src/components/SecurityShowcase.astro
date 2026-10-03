@@ -363,13 +363,28 @@ const groupDescriptions = {
   }
 
   @media (max-width: 760px) {
-    .bakeoff-plot {
-      overflow-x: auto;
-      padding-left: 2.1rem;
+    .bakeoff-bars-row {
+      height: 13rem;
     }
 
-    .bakeoff-groups {
-      min-width: 36rem;
+    .bakeoff-bars-row,
+    .bakeoff-xlabels {
+      column-gap: 0.5rem;
+    }
+
+    .bakeoff-bars {
+      gap: 3px;
+    }
+
+    .bakeoff-bar {
+      width: auto;
+      flex: 1 1 0;
+      min-width: 8px;
+    }
+
+    .bakeoff-xlabel {
+      font-size: 0.8rem;
+      gap: 0.25rem;
     }
   }
 </style>

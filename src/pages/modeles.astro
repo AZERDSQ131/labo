@@ -8,11 +8,6 @@ const modelOrder = ['g0-nano', 'g1-nano', 'g2-nano', 'g2-nano-safety'];
 const orderedModels = [...models].sort(
   (a, b) => modelOrder.indexOf(a.slug) - modelOrder.indexOf(b.slug),
 );
-const categoryOrder: Array<'Série G' | 'Sécurité'> = ['Série G', 'Sécurité'];
-const categoryGroups = categoryOrder.map((label) => ({
-  label,
-  models: orderedModels.filter((model) => model.category === label),
-}));
 ---
 
 <Base
@@ -31,17 +26,8 @@ const categoryGroups = categoryOrder.map((label) => ({
 
   <section class="section models-content">
     <div class="wrap">
-      <div class="model-groups">
-        {
-          categoryGroups.map((group, index) => (
-            <section class="model-group" aria-labelledby={`category-${index}`}>
-              <h2 id={`category-${index}`}>{group.label}</h2>
-              <div class="model-list">
-                {group.models.map((model) => <ModelCard model={model} />)}
-              </div>
-            </section>
-          ))
-        }
+      <div class="model-list">
+        {orderedModels.map((model) => <ModelCard model={model} />)}
       </div>
     </div>
   </section>
@@ -52,22 +38,8 @@ const categoryGroups = categoryOrder.map((label) => ({
     padding-bottom: 0;
   }
 
-  .model-groups {
-    display: grid;
-    gap: clamp(2.5rem, 5vw, 4rem);
-  }
-
-  .model-group h2 {
-    margin: 0;
-    color: var(--faint);
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    font-weight: 500;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-
   .model-list {
-    margin-top: 0.35rem;
+    display: grid;
+    gap: 0;
   }
 </style>

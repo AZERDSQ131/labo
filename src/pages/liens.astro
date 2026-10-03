@@ -84,25 +84,6 @@ const published = models.filter((m) => m.links.length > 0);
     </div>
   </section>
 
-  <section class="section">
-    <div class="wrap">
-      <h2>Dépôts GitHub</h2>
-      <ul class="repos">
-        <li>
-          <a href={externalLinks.githubG0} rel="external">G0-nano</a>
-          <span>code source complet du pipeline (Apache 2.0)</span>
-        </li>
-        <li>
-          <a href={externalLinks.githubC1} rel="external">gdn2-vs-transformer-scaling</a>
-          <span>kit de reproduction de l'expérience C1</span>
-        </li>
-        <li>
-          <a href={externalLinks.githubAA} rel="external">aa-intelligence-index-reverse</a>
-          <span>calculateur de l'Artificial Analysis Intelligence Index</span>
-        </li>
-      </ul>
-    </div>
-  </section>
 </Base>
 
 <style>
@@ -119,7 +100,7 @@ const published = models.filter((m) => m.links.length > 0);
     align-items: center;
     justify-content: space-between;
     gap: 2rem;
-    border-color: color-mix(in srgb, var(--c-orange) 55%, white);
+    border-color: color-mix(in srgb, var(--c-orange) 55%, var(--bg));
     box-shadow: 0 16px 40px -24px color-mix(in srgb, var(--c-orange) 55%, transparent);
   }
 
@@ -199,29 +180,6 @@ const published = models.filter((m) => m.links.length > 0);
     padding: 0;
     display: grid;
     gap: 0.4rem;
-  }
-
-  .repos {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: 0.9rem;
-  }
-
-  .repos li {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-  }
-
-  .repos a {
-    font-weight: 500;
-  }
-
-  .repos span {
-    color: var(--muted);
-    font-size: 0.9rem;
   }
 
   @media (max-width: 720px) {

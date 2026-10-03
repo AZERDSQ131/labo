@@ -43,6 +43,33 @@
   --tooltip-z: 1000;
 }
 
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #101012;
+  --surface: #17171a;
+  --surface-2: #212126;
+  --ink: #fcfcfa;
+  --muted: #a9a9b1;
+  --line: rgb(255 255 255 / 0.1);
+  --line-strong: rgb(255 255 255 / 0.26);
+  --faint: var(--c-gray);
+  --c-blue: #6aa5e6;
+  --c-green: #b4d9a8;
+  --c-orange: #eda37e;
+  --c-yellow: #edd56a;
+  --c-gray: #9aa0a6;
+  --c-blue-ink: color-mix(in srgb, var(--c-blue) 52%, var(--ink));
+  --c-green-ink: color-mix(in srgb, var(--c-green) 28%, var(--ink));
+  --c-orange-ink: color-mix(in srgb, var(--c-orange) 42%, var(--ink));
+  --c-yellow-ink: color-mix(in srgb, var(--c-yellow) 32%, var(--ink));
+  --accent: var(--c-blue-ink);
+  --tooltip-bg: #fcfcfa;
+  --tooltip-fg: #101012;
+  --tooltip-border: #8e8e96;
+}
+html[data-theme="dark"] ::selection { background: var(--c-blue); color: var(--bg); }
+html[data-theme="dark"] :focus-visible { outline-color: var(--c-blue); }
+
 /* ── Base ───────────────────────────────────────────────── */
 *,
 *::before,
@@ -238,7 +265,7 @@ pre code {
 }
 
 .btn-primary:hover {
-  background: #2c2c30;
+  background: color-mix(in srgb, var(--ink) 88%, var(--bg));
 }
 
 .btn-ghost {
@@ -269,20 +296,20 @@ pre code {
 }
 
 .badge-published {
-  background: color-mix(in srgb, var(--c-green) 48%, white);
-  border-color: color-mix(in srgb, var(--c-green) 72%, white);
+  background: color-mix(in srgb, var(--c-green) 48%, var(--bg));
+  border-color: color-mix(in srgb, var(--c-green) 72%, var(--bg));
   color: var(--c-green-ink);
 }
 
 .badge-soon {
-  background: color-mix(in srgb, var(--c-orange) 42%, white);
-  border-color: color-mix(in srgb, var(--c-orange) 68%, white);
+  background: color-mix(in srgb, var(--c-orange) 42%, var(--bg));
+  border-color: color-mix(in srgb, var(--c-orange) 68%, var(--bg));
   color: var(--c-orange-ink);
 }
 
 .badge-lab {
-  background: color-mix(in srgb, var(--c-yellow) 48%, white);
-  border-color: color-mix(in srgb, var(--c-yellow) 72%, white);
+  background: color-mix(in srgb, var(--c-yellow) 48%, var(--bg));
+  border-color: color-mix(in srgb, var(--c-yellow) 72%, var(--bg));
   color: var(--c-yellow-ink);
 }
 
@@ -303,8 +330,8 @@ a.card {
 a.card:hover {
   text-decoration: none;
   transform: translateY(-4px);
-  border-color: color-mix(in srgb, var(--c, #101012) 45%, white);
-  box-shadow: 0 12px 32px -18px color-mix(in srgb, var(--c, #101012) 45%, transparent);
+  border-color: color-mix(in srgb, var(--c, var(--ink)) 45%, var(--bg));
+  box-shadow: 0 12px 32px -18px color-mix(in srgb, var(--c, var(--ink)) 45%, transparent);
 }
 
 /* ── Tables ─────────────────────────────────────────────── */

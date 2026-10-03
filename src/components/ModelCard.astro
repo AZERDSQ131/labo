@@ -6,17 +6,20 @@ interface Props {
 }
 
 const { model } = Astro.props;
-const accent = model.category === 'Sécurité' ? 'var(--c-yellow)' : 'var(--c-blue)';
+const accent = model.slug === 'g2-nano-safety' ? 'var(--c-yellow)' : 'var(--c-blue)';
+const base = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
 const favicons = {
-  huggingface: '/favicons/huggingface.png',
-  ollama: '/favicons/ollama.png',
-  github: '/favicons/github.png',
+  huggingface: `${base}favicons/huggingface.png`,
+  ollama: `${base}favicons/ollama.png`,
+  github: `${base}favicons/github.png`,
+  'github-dark': `${base}favicons/github-dark.png`,
 } as const;
 ---
 
 <article class="model" id={model.slug} style={`--c: ${accent}`}>
   <div class="copy">
-    <p class="kicker">{model.category}</p>
     <h2>{model.name}</h2>
     <p class="description">{model.description}</p>
   </div>
@@ -26,7 +29,28 @@ const favicons = {
       model.links.map((link) => (
         <li>
           <a href={link.href} rel="external">
-            <img src={favicons[link.kind]} alt="" width="16" height="16" />
+            {
+              link.kind === 'github' ? (
+                <>
+                  <img
+                    class="logo-light"
+                    src={favicons.github}
+                    alt=""
+                    width="16"
+                    height="16"
+                  />
+                  <img
+                    class="logo-dark"
+                    src={favicons['github-dark']}
+                    alt=""
+                    width="16"
+                    height="16"
+                  />
+                </>
+              ) : (
+                <img src={favicons[link.kind]} alt="" width="16" height="16" />
+              )
+            }
             <span>{link.label}</span>
           </a>
         </li>
@@ -43,15 +67,6 @@ const favicons = {
     padding: 1.6rem 0;
     border-top: 1px solid var(--line);
     scroll-margin-top: 5.5rem;
-  }
-
-  .kicker {
-    margin: 0 0 0.45rem;
-    color: color-mix(in srgb, var(--c) 62%, var(--ink));
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.13em;
-    text-transform: uppercase;
   }
 
   h2 {
@@ -90,6 +105,18 @@ const favicons = {
     height: 16px;
     flex: 0 0 auto;
     object-fit: contain;
+  }
+
+  .links .logo-dark {
+    display: none;
+  }
+
+  :global(html[data-theme='dark']) .links .logo-light {
+    display: none;
+  }
+
+  :global(html[data-theme='dark']) .links .logo-dark {
+    display: block;
   }
 
   .links a:hover span {

@@ -90,6 +90,7 @@ const benchRows = [
   },
 ];
 
+const base = (import.meta.env.BASE_URL.endsWith("/") ? import.meta.env.BASE_URL.slice(0, -1) : import.meta.env.BASE_URL) || "";
 ---
 
 <Base
@@ -103,23 +104,23 @@ const benchRows = [
         <span class="dim">Petits modèles.</span><br />Vraie recherche.
       </h1>
       <div class="hero-cta rise rise-1">
-        <a class="btn btn-primary" href="/labo/modeles">Voir les modèles</a>
-        <a class="btn btn-ghost" href="/labo/benchmarks">Lire les benchmarks</a>
+        <a class="btn btn-primary" href={`${base}/modeles`}">Voir les modèles</a>
+        <a class="btn btn-ghost" href={`${base}/benchmarks`}">Lire les benchmarks</a>
       </div>
       <div class="model-menu-grid">
-        <a class="model-menu-item" href="/labo/modeles#g1-nano">
+        <a class="model-menu-item" href={`${base}/modeles#g1-nano`}">
           <span class="eyebrow" style="--c: var(--c-blue)">Modèle généraliste</span>
           <h2>G1 Nano</h2>
           <p>Contexte 2048 tokens et conversations multi-tour, à taille compacte.</p>
           <span class="model-menu-more">Voir le modèle →</span>
         </a>
-        <a class="model-menu-item" href="/labo/modeles#g2-nano">
+        <a class="model-menu-item" href={`${base}/modeles#g2-nano`}">
           <span class="eyebrow" style="--c: var(--c-orange)">Journal de labo</span>
           <h2>G2 Nano</h2>
           <p>Deux fois plus de tokens, gains faibles, résultats documentés sans promesse de victoire.</p>
           <span class="model-menu-more">Voir le modèle →</span>
         </a>
-        <a class="model-menu-item" href="/labo/modeles#g2-nano-safety">
+        <a class="model-menu-item" href={`${base}/modeles#g2-nano-safety`}">
           <span class="eyebrow" style="--c: var(--c-yellow)">Sécurité</span>
           <h2>G2 Nano Safety</h2>
           <p>Juge ALLOW, REDACT ou BLOCK pour les messages sortants, avec filet déterministe.</p>
@@ -155,7 +156,7 @@ const benchRows = [
         />
         <p class="table-note">
           Moyenne des benchmarks selon le nombre de paramètres.
-          <a href="/labo/benchmarks">Détails</a>
+          <a href={`${base}/benchmarks`}">Détails</a>
         </p>
       </div>
     </div>
@@ -214,7 +215,7 @@ const benchRows = [
     padding: 1.5rem;
     border: 1px solid var(--line);
     border-radius: 18px;
-    background: rgb(255 255 255 / 0.42);
+    background: color-mix(in srgb, var(--surface) 55%, transparent);
     color: var(--ink);
     text-decoration: none;
   }
@@ -267,10 +268,19 @@ const benchRows = [
   }
 
   @media (max-width: 640px) {
-    .model-menu-grid {
-      grid-template-columns: 1fr;
-      max-width: 300px;
+    .hero-cta a {
+      flex: 1 1 100%;
+      justify-content: center;
     }
 
+    .model-menu-grid {
+      grid-template-columns: 1fr;
+      max-width: none;
+      justify-items: stretch;
+    }
+
+    .model-menu-item {
+      min-height: 0;
+    }
   }
 </style>

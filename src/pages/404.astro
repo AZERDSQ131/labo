@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+const base = (import.meta.env.BASE_URL.endsWith("/") ? import.meta.env.BASE_URL.slice(0, -1) : import.meta.env.BASE_URL) || "";
 ---
 
 <Base title="Page introuvable" description="La page demandée n'existe pas.">
@@ -9,8 +10,8 @@ import Base from '../layouts/Base.astro';
       <h1>Cette page n'existe pas.</h1>
       <p class="lede">Le lien est peut-être ancien ou l'adresse mal saisie.</p>
       <div class="cta">
-        <a class="btn btn-primary" href="/labo/">Retour à l'accueil</a>
-        <a class="btn btn-ghost" href="/labo/modeles">Voir les modèles</a>
+        <a class="btn btn-primary" href={`${base}/`}">Retour à l'accueil</a>
+        <a class="btn btn-ghost" href={`${base}/modeles`}">Voir les modèles</a>
       </div>
     </div>
   </section>
